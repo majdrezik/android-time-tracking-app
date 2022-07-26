@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +41,13 @@ public class MainActivity extends AppCompatActivity {
                     // SystemClock.elapsedRealtime() is the number of milliseconds since the device was turned on.
                     // without the following line, when we stop the chronometer for a specific time, it will start again with the specific time that passed in the background.
                     // i.e. if we stopped the timer at 5:00 for 30 seconds, and start again, it'll start from 5:30 instead of 5:00
+                    showToast("start timer");
                     chronometer.setBase(SystemClock.elapsedRealtime()- pauseOffSet);
 //                    System.out.println(SystemClock.elapsedRealtime()- pauseOffSet);
                     chronometer.start();
                     isPlaying = true;
                 }else{
+                    showToast("pause timer");
                     chronometer.stop();
                     pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
                     isPlaying = false;
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(isPlaying){
+                    showToast("reset timer");
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     pauseOffSet = 0;
                     chronometer.start();
@@ -107,5 +111,10 @@ public class MainActivity extends AppCompatActivity {
         }
         System.out.println("totalTime : " + totalTime);
         return totalTime;
+    }
+
+    private void showToast(String msg){
+        Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
+
     }
 }
