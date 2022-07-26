@@ -9,6 +9,7 @@ import android.widget.Chronometer;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean isPlaying = false;
     private ToggleButton toggleButton;
     private Button reset_btn;
-    private List<Long> times;
+    private List<Integer> times = new ArrayList<>();
+    private int listIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +41,14 @@ public class MainActivity extends AppCompatActivity {
                     // without the following line, when we stop the chronometer for a specific time, it will start again with the specific time that passed in the background.
                     // i.e. if we stopped the timer at 5:00 for 30 seconds, and start again, it'll start from 5:30 instead of 5:00
                     chronometer.setBase(SystemClock.elapsedRealtime()- pauseOffSet);
+//                    System.out.println(SystemClock.elapsedRealtime()- pauseOffSet);
                     chronometer.start();
                     isPlaying = true;
                 }else{
                     chronometer.stop();
                     pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
                     isPlaying = false;
-//                    updateTimesList(pauseOffSet);
-//                    printList();
+                    updateTimesList();
                 }
             }
         });
@@ -60,13 +62,29 @@ public class MainActivity extends AppCompatActivity {
                     pauseOffSet = 0;
                     chronometer.start();
                     isPlaying = true;
+                    calculateTotalTime();
                 }
             }
         });
     }
 
-    private void updateTimesList(long chunk){
-        times.add(chunk);
+    private void updateTimesList(){
+        int stoppedMilliseconds = 0;
+
+        String chronoText = chronometer.getText().toString();
+        String array[] = chronoText.split(":");
+        if (array.length == 2) {
+            stoppedMilliseconds = Integer.parseInt(array[0]) * 60
+                    + Integer.parseInt(array[1]) ;
+        } else if (array.length == 3) {
+            stoppedMilliseconds = Integer.parseInt(array[0]) * 60 * 60
+                    + Integer.parseInt(array[1]) * 60
+                    + Integer.parseInt(array[2]);
+        }
+//        int printValue;
+        int maxSoFar=0;
+        times.add(listIndex++, stoppedMilliseconds);
+        System.out.println("added " + stoppedMilliseconds);
     }
 
     private void printList(){
@@ -75,4 +93,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    private int calculateTotalTime(){
+        if(times.get(0) == null){
+            System.out.println("No times stored...");
+            System.exit(1);
+        }
+        int totalTime=times.get(0);
+        int index=1;
+        while (index < times.size()){
+                totalTime += times.get(index) - times.get(index-1);
+                index++;
+        }
+        System.out.println("totalTime : " + totalTime);
+        return totalTime;
+    }
 }
