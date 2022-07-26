@@ -2,22 +2,23 @@ package com.example.hourstracker;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
-import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private Chronometer chronometer;
-    private long PauseOffSet = 0;
+    private long pauseOffSet = 0;
     private boolean isPlaying = false;
     private ToggleButton toggleButton;
     private Button reset_btn;
+    private List<Long> times;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,29 +38,45 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton compoundButton, boolean buttonState) {
                 //buttonState: true if button is pressed, otherwise false
                 if(buttonState){
-                    chronometer.setBase(SystemClock.elapsedRealtime()- PauseOffSet);
+                    // SystemClock.elapsedRealtime() is the number of milliseconds since the device was turned on.
+                    // without the following line, when we stop the chronometer for a specific time, it will start again with the specific time that passed in the background.
+                    // i.e. if we stopped the timer at 5:00 for 30 seconds, and start again, it'll start from 5:30 instead of 5:00
+                    chronometer.setBase(SystemClock.elapsedRealtime()- pauseOffSet);
                     chronometer.start();
                     isPlaying = true;
                 }else{
                     chronometer.stop();
-                    PauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
+                    pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
                     isPlaying = false;
+//                    updateTimesList(pauseOffSet);
+//                    printList();
                 }
             }
         });
 
-        // in our project, we tried to implement the same idea that is done in iphones.
+        // in our project, we tried to implement the same idea that is done in iPhones.
         // the timer could only be reset when it's paused.
         reset_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!isPlaying){
                     chronometer.setBase(SystemClock.elapsedRealtime());
-                    PauseOffSet = 0;
+                    pauseOffSet = 0;
                     chronometer.start();
                     isPlaying = true;
                 }
             }
         });
     }
+
+    private void updateTimesList(long chunk){
+        times.add(chunk);
+    }
+
+    private void printList(){
+        for(int i=0;i<times.size();i++){
+            System.out.println(times.get(i));
+        }
+    }
+
 }
