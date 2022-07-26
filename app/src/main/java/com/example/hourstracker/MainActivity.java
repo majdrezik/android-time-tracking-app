@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // in our project, we tried to implement the same idea that is done in iPhones.
+        // in our project, we tried to implement the same idea that is done in iPhones. (better UX)
         // the timer could only be reset when it's paused.
         reset_btn.setOnClickListener(new View.OnClickListener() {
             @Override
