@@ -1,13 +1,17 @@
 package com.example.hourstracker.ui.home;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -52,6 +56,7 @@ public class HomeFragment extends Fragment {
     private Button reset_btn;
     private List<Integer> times = new ArrayList<>();
     private int listIndex = 0;
+    private String m_Text = "";
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -60,7 +65,7 @@ public class HomeFragment extends Fragment {
        //viewy setContentView(R.layout.activity_main);
         chronometer = view.findViewById(R.id.chronometer);
         toggleButton = view.findViewById(R.id.Toggle);
-        reset_btn = view.findViewById(R.id.reset_btn);
+//        reset_btn = view.findViewById(R.id.reset_btn);
         toggleButton.setText(null);
         toggleButton.setTextOn(null);
         toggleButton.setTextOff(null);
@@ -69,38 +74,67 @@ public class HomeFragment extends Fragment {
             public void onCheckedChanged(CompoundButton compoundButton, boolean buttonState) {
                 //buttonState: true if button is pressed, otherwise false
                 if(buttonState){
+                    chronometer.setBase(SystemClock.elapsedRealtime());
                     // SystemClock.elapsedRealtime() is the number of milliseconds since the device was turned on.
                     // without the following line, when we stop the chronometer for a specific time, it will start again with the specific time that passed in the background.
                     // i.e. if we stopped the timer at 5:00 for 30 seconds, and start again, it'll start from 5:30 instead of 5:00
                     showToast("start timer");
-                    chronometer.setBase(SystemClock.elapsedRealtime()- pauseOffSet);
+//                    chronometer.setBase(SystemClock.elapsedRealtime()- pauseOffSet);
 //                    System.out.println(SystemClock.elapsedRealtime()- pauseOffSet);
                     chronometer.start();
                     isPlaying = true;
                 }else{
                     showToast("pause timer");
                     chronometer.stop();
-                    pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
+//                    pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
                     isPlaying = false;
                     updateTimesList();
+                    showDialog();
                 }
             }
         });
 
         // in our project, we decided that the restart could be done only when the timer is running. i.e, isPlaying == true
-        reset_btn.setOnClickListener(new View.OnClickListener() {
+//        reset_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(isPlaying){
+//                    showToast("reset timer");
+//                    chronometer.setBase(SystemClock.elapsedRealtime());
+//                    pauseOffSet = 0;
+//                    chronometer.start();
+//                    isPlaying = true;
+//                    calculateTotalTime();
+//                }
+//            }
+//        });
+    }
+
+    private void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Title");
+
+// Set up the input
+        final EditText input = new EditText(this);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if(isPlaying){
-                    showToast("reset timer");
-                    chronometer.setBase(SystemClock.elapsedRealtime());
-                    pauseOffSet = 0;
-                    chronometer.start();
-                    isPlaying = true;
-                    calculateTotalTime();
-                }
+            public void onClick(DialogInterface dialog, int which) {
+                m_Text = input.getText().toString();
             }
         });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     private void updateTimesList(){
@@ -119,6 +153,7 @@ public class HomeFragment extends Fragment {
 //        int printValue;
         int maxSoFar=0;
         times.add(listIndex++, stoppedMilliseconds);
+        System.out.println("--------------------------");
         System.out.println("added " + stoppedMilliseconds);
     }
 
