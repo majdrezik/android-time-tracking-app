@@ -88,6 +88,12 @@ public void AddNewShift(Shift newShift){
         editor.commit();
     }
     public void notifyChangedShiftsList(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(allShifts);
+        editor.putString("shifts",json);
+        editor.commit();
         this.shifts.setValue(this.allShifts);
     }
 
