@@ -33,25 +33,20 @@ public class MainActivity extends AppCompatActivity implements ShiftsAdapter.Shi
         setContentView(binding.getRoot());
 //        ShiftsViewModel shiftsViewModel = new ViewModelProvider(this).get(ShiftsViewModel.class);
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
+//        BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_dashboard)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main2);
-//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+
+
         NavigationUI.setupWithNavController(binding.navView, navController);
 
 
     }
-    @Override
-    public boolean onPrepareOptionsMenu (Menu menu)
-    {
-        menu.clear();
-        getMenuInflater().inflate(R.menu.main,menu);
-        return true;
-    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
@@ -62,7 +57,8 @@ public class MainActivity extends AppCompatActivity implements ShiftsAdapter.Shi
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.exit_btn:
-                getSupportFragmentManager().beginTransaction().add(android.R.id.content, ExitAppDialogFragment.newInstance()).addToBackStack(null).commit();
+//                getSupportFragmentManager().beginTransaction().add(android.R.id.content, ).addToBackStack(null).commit();
+                ExitAppDialogFragment.newInstance().show(getSupportFragmentManager(),"EXIT");
                 return true;
             default:
                 break;

@@ -3,11 +3,30 @@ package com.example.hourstracker.ui.Models;
 import java.util.Date;
 
 public class Shift {
+
 	private Time startTime;
 	private Time endTime;
 	private Date shiftDate;
 	private String Notes;
 	private int totalHours;
+	private int longitude;
+	private int latitude;
+
+	public int getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(int longitude) {
+		this.longitude = longitude;
+	}
+
+	public int getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(int latitude) {
+		this.latitude = latitude;
+	}
 
 	public Time getStartTime() {
 		return startTime;

@@ -66,7 +66,27 @@ public void AddNewShift(Shift newShift){
         }
         return selectedShift;
     }
+    public void saveEntrance(Shift shift) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(shift);
+        editor.putString("entrance",json);
+        editor.commit();
+    }
+    public Shift getSavedEntrance() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        Type type = new TypeToken<Shift>(){}.getType();
 
+        return gson.fromJson(sharedPreferences.getString("entrance","null"),type);
+    }
+    public void deleteEntrance(Shift shift) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("entrance");
+        editor.commit();
+    }
     public void notifyChangedShiftsList(){
         this.shifts.setValue(this.allShifts);
     }
