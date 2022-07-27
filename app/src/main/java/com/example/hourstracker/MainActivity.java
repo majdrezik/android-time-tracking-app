@@ -1,120 +1,38 @@
 package com.example.hourstracker;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Chronometer;
-import android.widget.CompoundButton;
-import android.widget.ToggleButton;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+
+import com.example.hourstracker.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Chronometer chronometer;
-    private long pauseOffSet = 0;
-    private boolean isPlaying = false;
-    private ToggleButton toggleButton;
-    private Button reset_btn;
-    private List<Integer> times = new ArrayList<>();
-    private int listIndex = 0;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        chronometer = findViewById(R.id.chronometer);
-        toggleButton = findViewById(R.id.Toggle);
-        reset_btn = findViewById(R.id.reset_btn);
-        toggleButton.setText(null);
-        toggleButton.setTextOn(null);
-        toggleButton.setTextOff(null);
-        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean buttonState) {
-                //buttonState: true if button is pressed, otherwise false
-                if(buttonState){
-                    // SystemClock.elapsedRealtime() is the number of milliseconds since the device was turned on.
-                    // without the following line, when we stop the chronometer for a specific time, it will start again with the specific time that passed in the background.
-                    // i.e. if we stopped the timer at 5:00 for 30 seconds, and start again, it'll start from 5:30 instead of 5:00
-                    showToast("start timer");
-                    chronometer.setBase(SystemClock.elapsedRealtime()- pauseOffSet);
-//                    System.out.println(SystemClock.elapsedRealtime()- pauseOffSet);
-                    chronometer.start();
-                    isPlaying = true;
-                }else{
-                    showToast("pause timer");
-                    chronometer.stop();
-                    pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
-                    isPlaying = false;
-                    updateTimesList();
-                }
-            }
-        });
 
-        // in our project, we decided that the restart could be done only when the timer is running. i.e, isPlaying == true
-        reset_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(isPlaying){
-                    showToast("reset timer");
-                    chronometer.setBase(SystemClock.elapsedRealtime());
-                    pauseOffSet = 0;
-                    chronometer.start();
-                    isPlaying = true;
-                    calculateTotalTime();
-                }
-            }
-        });
-    }
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-    private void updateTimesList(){
-        int stoppedMilliseconds = 0;
-
-        String chronoText = chronometer.getText().toString();
-        String array[] = chronoText.split(":");
-        if (array.length == 2) {
-            stoppedMilliseconds = Integer.parseInt(array[0]) * 60
-                    + Integer.parseInt(array[1]) ;
-        } else if (array.length == 3) {
-            stoppedMilliseconds = Integer.parseInt(array[0]) * 60 * 60
-                    + Integer.parseInt(array[1]) * 60
-                    + Integer.parseInt(array[2]);
-        }
-//        int printValue;
-        int maxSoFar=0;
-        times.add(listIndex++, stoppedMilliseconds);
-        System.out.println("added " + stoppedMilliseconds);
-    }
-
-    private void printList(){
-        for(int i=0;i<times.size();i++){
-            System.out.println(times.get(i));
-        }
-    }
-
-
-    private int calculateTotalTime(){
-        if(times.get(0) == null){
-            System.out.println("No times stored...");
-            System.exit(1);
-        }
-        int totalTime=times.get(0);
-        int index=1;
-        while (index < times.size()){
-                totalTime += times.get(index) - times.get(index-1);
-                index++;
-        }
-        System.out.println("totalTime : " + totalTime);
-        return totalTime;
-    }
-
-    private void showToast(String msg){
-        Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main2);
+        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.navView, navController);
 
     }
+
 }
