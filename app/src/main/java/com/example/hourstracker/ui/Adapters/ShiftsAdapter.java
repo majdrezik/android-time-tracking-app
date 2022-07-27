@@ -35,9 +35,9 @@ public class ShiftsAdapter extends
         myViewModel.getShifts(context).observe((AppCompatActivity) context, countries -> {
             this.allShifts = countries;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                this.allShifts.removeIf(shift -> {
-                    return deletedCounriesName.indexOf(shift.getName())>=0;
-                });
+              //  this.allShifts.removeIf(shift -> {
+                 //   return deletedCounriesName.indexOf(shift.getName())>=0;
+                //});
             }
             notifyDataSetChanged();
 
@@ -99,8 +99,8 @@ public class ShiftsAdapter extends
     public void onItemLongCLick(int position) {
         Shift shift = this.allShifts.get(position);
         this.allShifts.remove(shift);
-        this.shiftsViewModel.deleteCountry(shift);
-        this.listener.updateShownShiftsList(false, shift.getName());
+        //this.shiftsViewModel.deleteCountry(shift);
+        //this.listener.updateShownShiftsList(false, shift.getName());
         if(this.selectedPosition>position){ // reset the selected position only if the current deleted one is before him in the list , else no need to reset the selected position
 //            this.selectedPosition = RecyclerView.NO_POSITION;
 //            this.countriesViewModel.setSelectedCountry(null);
@@ -143,7 +143,7 @@ public class ShiftsAdapter extends
         private void bindData(int position) {
             final Shift shift = allShifts.get(position);
             positionInt = position;
-            startTime.setText(shift.getName());
+            //startTime.setText(shift.getName());
             //countryShort.setText(shift.getShorty());
 //            this.position.setText(String.valueOf(position));
 //            dateCreated.setText(new Date().toString());
@@ -154,9 +154,9 @@ public class ShiftsAdapter extends
                 @Override
                 public boolean onLongClick(View view) {
                     onItemLongCLick(position);
-                    Toast.makeText(context,
-                            String.format("The shift (%s) deleted successfully", shift.getName()),
-                            Toast.LENGTH_LONG).show();
+//                    Toast.makeText(context,
+//                            //String.format("The shift (%s) deleted successfully", shift.getName()),
+//                            Toast.LENGTH_LONG).show();
                     return false;
                 }
             });
