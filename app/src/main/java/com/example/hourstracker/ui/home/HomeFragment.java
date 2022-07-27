@@ -32,7 +32,7 @@ import com.example.hourstracker.ui.ViewModels.ShiftsViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDialogListener {
 
     private FragmentHomeBinding binding;
 
@@ -91,6 +91,7 @@ public class HomeFragment extends Fragment {
                     chronometer.start();
                     isPlaying = true;
                 }else{
+//                    NoteDialogFragment.newInstance(HomeFragment.this).show(getFragmentManager(),"");
                     showToast("pause timer");
                     chronometer.stop();
 //                    pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
@@ -198,6 +199,11 @@ public class HomeFragment extends Fragment {
 
     private void showToast(String msg){
         Toast.makeText(getActivity().getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onFinishSelectPrecision(String note) {
 
     }
 }
