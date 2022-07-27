@@ -135,7 +135,7 @@ public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDi
         System.out.println("Start Time: ");
         System.out.println(now.toString());
         newShift.setStartTime(now);
-        shiftsViewModel.addNewShift(newShift);
+        shiftsViewModel.saveEntrance(newShift);
     }
     
 //    private void showDialog() {
