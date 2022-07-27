@@ -21,13 +21,13 @@ import java.text.SimpleDateFormat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hourstracker.R;
 import com.example.hourstracker.databinding.FragmentHomeBinding;
 import com.example.hourstracker.ui.Dialogs.NoteDialogFragment;
-import com.example.hourstracker.ui.Models.Shift;
 import com.example.hourstracker.ui.ViewModels.ShiftsViewModel;
 
 import java.util.ArrayList;
@@ -76,6 +76,11 @@ public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDi
         toggleButton.setText(null);
         toggleButton.setTextOn(null);
         toggleButton.setTextOff(null);
+        HomeViewModel myViewModel = new ViewModelProvider((AppCompatActivity) getActivity()).get(HomeViewModel.class);
+        myViewModel.getShift().observe((AppCompatActivity) getActivity(),(res)->{
+
+        });
+
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean buttonState) {
