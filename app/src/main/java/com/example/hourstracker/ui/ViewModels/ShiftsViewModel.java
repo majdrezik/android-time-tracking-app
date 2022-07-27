@@ -66,7 +66,7 @@ public void addNewShift(Shift newShift,Context context){
         }
         return selectedShift;
     }
-    public void saveEntrance(Shift shift) {
+    public void saveEntrance(Shift shift,Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -74,14 +74,14 @@ public void addNewShift(Shift newShift,Context context){
         editor.putString("entrance",json);
         editor.commit();
     }
-    public Shift getSavedEntrance() {
+    public Shift getSavedEntrance(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         Type type = new TypeToken<Shift>(){}.getType();
 
         return gson.fromJson(sharedPreferences.getString("entrance","null"),type);
     }
-    public void deleteEntrance(Shift shift) {
+    public void deleteEntrance(Shift shift,Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("entrance");
