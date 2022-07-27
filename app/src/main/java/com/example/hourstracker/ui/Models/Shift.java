@@ -12,23 +12,41 @@ public class Shift {
 	private Date shiftDate;
 	private String Notes;
 	private int totalHours;
-	private int longitude;
-	private int latitude;
+	private int startLongitude;
+	private int startLatitude;
 
-	public int getLongitude() {
-		return longitude;
+	public int getEndLongitude() {
+		return endLongitude;
 	}
 
-	public void setLongitude(int longitude) {
-		this.longitude = longitude;
+	public void setEndLongitude(int endLongitude) {
+		this.endLongitude = endLongitude;
 	}
 
-	public int getLatitude() {
-		return latitude;
+	public int getEndLatitude() {
+		return endLatitude;
 	}
 
-	public void setLatitude(int latitude) {
-		this.latitude = latitude;
+	public void setEndLatitude(int endLatitude) {
+		this.endLatitude = endLatitude;
+	}
+
+	private int endLongitude;
+	private int endLatitude;
+	public int getStartLongitude() {
+		return startLongitude;
+	}
+
+	public void setStartLongitude(int startLongitude) {
+		this.startLongitude = startLongitude;
+	}
+
+	public int getStartLatitude() {
+		return startLatitude;
+	}
+
+	public void setStartLatitude(int startLatitude) {
+		this.startLatitude = startLatitude;
 	}
 
 	public Time getStartTime() {
