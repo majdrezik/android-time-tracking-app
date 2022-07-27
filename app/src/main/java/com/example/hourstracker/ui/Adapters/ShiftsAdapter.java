@@ -27,23 +27,19 @@ public class ShiftsAdapter extends
     ShiftAdapterListener listener;
     ShiftsViewModel shiftsViewModel;
     private int selectedPosition = RecyclerView.NO_POSITION;
-    public ShiftsAdapter(Context context, ShiftAdapterListener listener, ArrayList<String> deletedCounriesName) {
+    public ShiftsAdapter(Context context, ShiftAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         ShiftsViewModel myViewModel = new ViewModelProvider((AppCompatActivity) context).get(ShiftsViewModel.class);
         this.shiftsViewModel = myViewModel;
         myViewModel.getShifts(context).observe((AppCompatActivity) context, countries -> {
             this.allShifts = countries;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-              //  this.allShifts.removeIf(shift -> {
-                 //   return deletedCounriesName.indexOf(shift.getName())>=0;
-                //});
-            }
+
             notifyDataSetChanged();
 
         });
 
-
+//myViewModel.AddNewShift(new Shift());
         myViewModel.getSelectedShift().observe((AppCompatActivity) context, shift -> {
             notifyItemChanged(this.selectedPosition);
             this.selectedPosition = this.allShifts.indexOf(shift);
@@ -127,14 +123,14 @@ public class ShiftsAdapter extends
         TextView endTime;
         TextView totalHours;
         TextView date;
-        ImageView Notes;
+        TextView Notes;
         int positionInt;
         public ShiftViewHolder(@NonNull View itemView) {
             super(itemView);
             this.itemView = itemView;
             startTime = itemView.findViewById(R.id.startTime);
-            Notes = itemView.findViewById(R.id.notes);
             endTime = itemView.findViewById(R.id.endTime);
+            Notes = itemView.findViewById(R.id.notes);
             totalHours = itemView.findViewById(R.id.totalHours);
             date = itemView.findViewById(R.id.date);
 
@@ -143,13 +139,12 @@ public class ShiftsAdapter extends
         private void bindData(int position) {
             final Shift shift = allShifts.get(position);
             positionInt = position;
-            //startTime.setText(shift.getName());
-            //countryShort.setText(shift.getShorty());
-//            this.position.setText(String.valueOf(position));
-//            dateCreated.setText(new Date().toString());
-//            String Uri = "@drawable/" + shift.getFlag().toLowerCase();
-//            int imageResource = context.getResources().getIdentifier(Uri, null, context.getPackageName());
-//            countryFlag.setImageResource(imageResource);
+
+            startTime.setText(shift.getStartTime()!=null?shift.getStartTime().toString():"");
+            endTime.setText(shift.getEndTime()!=null?shift.getEndTime().toString():"");
+            Notes.setText(shift.getNotes()!=null?shift.getNotes():"");
+            totalHours.setText(""+shift.getTotalHours());
+            date.setText(shift.getShiftDate()!=null?shift.getShiftDate().toString():"");
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -160,16 +155,16 @@ public class ShiftsAdapter extends
                     return false;
                 }
             });
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-//                    notifyItemChanged(selectedPosition);
-                    shiftsViewModel.setSelectedShift(shift);
-//                    notifyItemChanged(getLayoutPosition());
-                    ((ShiftAdapterListener) context).onShiftChange(position, shift);
-
-                }
-            });
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+////                    notifyItemChanged(selectedPosition);
+//                    shiftsViewModel.setSelectedShift(shift);
+////                    notifyItemChanged(getLayoutPosition());
+//                    ((ShiftAdapterListener) context).onShiftChange(position, shift);
+//
+//                }
+//            });
         }
 
 
