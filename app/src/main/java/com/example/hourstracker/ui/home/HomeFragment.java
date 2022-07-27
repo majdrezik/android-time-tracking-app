@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hourstracker.R;
 import com.example.hourstracker.databinding.FragmentHomeBinding;
+import com.example.hourstracker.ui.Dialogs.NoteDialogFragment;
 import com.example.hourstracker.ui.Models.Shift;
 import com.example.hourstracker.ui.ViewModels.ShiftsViewModel;
 
@@ -127,7 +128,7 @@ public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDi
         newShift.setStartTime(now);
         shiftsViewModel.addNewShift(newShift);
     }
-
+    
 //    private void showDialog() {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //        builder.setTitle("Title");
