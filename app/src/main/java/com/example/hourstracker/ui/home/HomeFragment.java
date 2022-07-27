@@ -28,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.hourstracker.R;
 import com.example.hourstracker.databinding.FragmentHomeBinding;
 import com.example.hourstracker.ui.Dialogs.NoteDialogFragment;
+import com.example.hourstracker.ui.Models.Shift;
 import com.example.hourstracker.ui.ViewModels.ShiftsViewModel;
 
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDi
     private List<Integer> times = new ArrayList<>();
     private int listIndex = 0;
     private String m_Text = "";
-    private ShiftsViewModel shiftsViewModel = new ShiftsViewModel();;
+    private ShiftsViewModel shiftsViewModel;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -76,16 +77,19 @@ public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDi
         toggleButton.setText(null);
         toggleButton.setTextOn(null);
         toggleButton.setTextOff(null);
+        shiftsViewModel = new ViewModelProvider((AppCompatActivity) getActivity()).get(ShiftsViewModel.class);
         HomeViewModel myViewModel = new ViewModelProvider((AppCompatActivity) getActivity()).get(HomeViewModel.class);
-        myViewModel.getShift().observe((AppCompatActivity) getActivity(),(res)->{
-
-        });
+//        myViewModel.getShift().observe((AppCompatActivity) getActivity(),(res)->
+//                asdasdasdasd
+//        );
 
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean buttonState) {
                 //buttonState: true if button is pressed, otherwise false
                 if(buttonState){
+//                    myViewModel.setCurrentShift();
+
                     addNewShiftToShiftsList();
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     // SystemClock.elapsedRealtime() is the number of milliseconds since the device was turned on.
