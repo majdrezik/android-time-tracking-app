@@ -16,6 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,6 +26,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hourstracker.R;
 import com.example.hourstracker.databinding.FragmentHomeBinding;
+import com.example.hourstracker.ui.Models.Shift;
+import com.example.hourstracker.ui.ViewModels.ShiftsViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +62,7 @@ public class HomeFragment extends Fragment {
     private List<Integer> times = new ArrayList<>();
     private int listIndex = 0;
     private String m_Text = "";
-
+    private ShiftsViewModel shiftsViewModel = new ShiftsViewModel();;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -65,6 +70,7 @@ public class HomeFragment extends Fragment {
        //viewy setContentView(R.layout.activity_main);
         chronometer = view.findViewById(R.id.chronometer);
         toggleButton = view.findViewById(R.id.Toggle);
+        //shiftsViewModel = new ShiftsViewModel();
 //        reset_btn = view.findViewById(R.id.reset_btn);
         toggleButton.setText(null);
         toggleButton.setTextOn(null);
@@ -74,6 +80,7 @@ public class HomeFragment extends Fragment {
             public void onCheckedChanged(CompoundButton compoundButton, boolean buttonState) {
                 //buttonState: true if button is pressed, otherwise false
                 if(buttonState){
+                    addNewShiftToShiftsList();
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     // SystemClock.elapsedRealtime() is the number of milliseconds since the device was turned on.
                     // without the following line, when we stop the chronometer for a specific time, it will start again with the specific time that passed in the background.
@@ -89,7 +96,7 @@ public class HomeFragment extends Fragment {
 //                    pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
                     isPlaying = false;
                     updateTimesList();
-                    showDialog();
+//                    showDialog();
                 }
             }
         });
@@ -110,32 +117,42 @@ public class HomeFragment extends Fragment {
 //        });
     }
 
-    private void showDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Title");
-
-// Set up the input
-        final EditText input = new EditText(this);
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
-
-// Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                m_Text = input.getText().toString();
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
+    private void addNewShiftToShiftsList() {
+        Shift newShift = new Shift();
+        Time now = new Time(SystemClock.elapsedRealtime());
+        now.setTime(SystemClock.elapsedRealtime());
+        System.out.println("Start Time: ");
+        System.out.println(now.toString());
+        newShift.setStartTime(now);
+        shiftsViewModel.addNewShift(newShift);
     }
+
+//    private void showDialog() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Title");
+//
+//// Set up the input
+//        final EditText input = new EditText(this);
+//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//        builder.setView(input);
+//
+//// Set up the buttons
+//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                m_Text = input.getText().toString();
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.cancel();
+//            }
+//        });
+//
+//        builder.show();
+//    }
 
     private void updateTimesList(){
         int stoppedMilliseconds = 0;

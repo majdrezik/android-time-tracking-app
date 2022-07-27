@@ -1,5 +1,8 @@
 package com.example.hourstracker.ui.Models;
 
+import java.sql.Time;
+
+
 import java.util.Date;
 
 public class Shift {

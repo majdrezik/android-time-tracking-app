@@ -28,7 +28,7 @@ public class ShiftsViewModel extends ViewModel {
 
         return shifts;
     }
-public void AddNewShift(Shift newShift){
+public void addNewShift(Shift newShift){
     allShifts.add(newShift);
     SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = sharedPreferences.edit();
