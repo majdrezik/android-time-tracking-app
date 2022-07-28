@@ -57,8 +57,8 @@ this.createNotificationChannel();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean notDipslayed=true;
-                while (notDipslayed==true) {
+                boolean notDisplayed=true;
+                while (notDisplayed==true) {
                     try {
                         Log.e("ExceededHoursService", "ExceededHoursService is running");
                         Date now= Calendar.getInstance().getTime();
@@ -67,7 +67,7 @@ this.createNotificationChannel();
                         long diffMinutes = diff/60; // parse to minutes
                         int hours = (int)diffMinutes/60;
                         if(hours>=9){
-                            notDipslayed=false;
+                            notDisplayed=false;
                             ExceededHoursService.this.showExceededNotification();
                         }else{
                             Thread.sleep(10000);
