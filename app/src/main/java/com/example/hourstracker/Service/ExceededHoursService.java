@@ -50,7 +50,7 @@ public class ExceededHoursService extends android.app.Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Date startDAte = (Date)intent.getExtras().get("startDate");
+        Date startDate = (Date)intent.getExtras().get("startDate");
 this.createNotificationChannel();
 
 // notificationId is a unique int for each notification that you must define
@@ -62,7 +62,7 @@ this.createNotificationChannel();
                     try {
                         Log.e("ExceededHoursService", "ExceededHoursService is running");
                         Date now= Calendar.getInstance().getTime();
-                        long diffMS =now.getTime()-startDAte.getTime();
+                        long diffMS =now.getTime()-startDate.getTime();
                         long diff = diffMS/1000; // parse to seconds
                         long diffMinutes = diff/60; // parse to minutes
                         int hours = (int)diffMinutes/60;
