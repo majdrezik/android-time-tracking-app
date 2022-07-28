@@ -27,9 +27,20 @@ public class NoteDialogFragment extends DialogFragment{
     private Dialog alertDialog;
     private INoteDialogListener listener;
     private View dialogView;
-    public static NoteDialogFragment newInstance(INoteDialogListener listener) {
+    public static NoteDialogFragment newInstance(INoteDialogListener listener,String note) {
         NoteDialogFragment frag = new NoteDialogFragment();
         frag.listener = listener;
+        Bundle args = new Bundle();
+
+        if(note==null){
+            args.putString("note","");
+
+        }else{
+            args.putString("note",note);
+
+        }
+        frag.setArguments(args);
+
         return frag;
     }
 
@@ -37,17 +48,20 @@ public class NoteDialogFragment extends DialogFragment{
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-dialogView = inflater.inflate(R.layout.note_dialog, null);
+        dialogView = inflater.inflate(R.layout.note_dialog, null);
         alertDialog = new AlertDialog.Builder(getActivity())
-                .setTitle("Set precision:")
+                .setTitle("Set note:")
                 .setView(dialogView)
                 .setPositiveButton("Ok",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                listener.onFinishSelectPrecision(note.getText().toString());
+                                listener.onFinishEnterNote(note.getText().toString());
                             }
                         }
-                )
+                ).setNegativeButton("Cancel",(dialogInterface, i) -> {
+                    listener.onCancelEnterNote();
+
+                })
                 .create();
         return alertDialog;
     }
@@ -58,6 +72,7 @@ dialogView = inflater.inflate(R.layout.note_dialog, null);
         note = dialogView.findViewById(R.id.note_dialog);
 
         if(getArguments()!=null){
+            note.setText(getArguments().getString("note"));
         }
 
         return super.onCreateView(inflater,container,savedInstanceState);
@@ -67,7 +82,8 @@ dialogView = inflater.inflate(R.layout.note_dialog, null);
 
 
     public interface INoteDialogListener {
-        void onFinishSelectPrecision(String note);
+        void onFinishEnterNote(String note);
+        void onCancelEnterNote();
 
     }
 

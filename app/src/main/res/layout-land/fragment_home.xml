@@ -32,7 +32,7 @@
         android:id="@+id/chronometer"
         android:layout_width="335dp"
         android:layout_height="114dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="28dp"
         android:background="@drawable/bg"
         android:paddingTop="25dp"
         android:textAlignment="center"
@@ -48,12 +48,24 @@
         android:background="@drawable/start_pause_btn_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.435"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chronometer"
         app:layout_constraintVertical_bias="0.0" />
 
-<!--    <Button-->
+    <TextView
+        android:id="@+id/summaryHome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="108dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--    <Button-->
 <!--        android:id="@+id/reset_btn"-->
 <!--        android:layout_width="75dp"-->
 <!--        android:layout_height="75dp"-->

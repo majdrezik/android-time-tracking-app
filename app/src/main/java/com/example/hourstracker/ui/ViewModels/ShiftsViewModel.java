@@ -18,14 +18,11 @@ public class ShiftsViewModel extends ViewModel {
     private ArrayList<Shift> allShifts = new ArrayList<>();
     private MutableLiveData<ArrayList<Shift>> shifts;
     private MutableLiveData<Shift> selectedShift;
-    private  Context context;
+    public ShiftsViewModel(){
+        shifts = new MutableLiveData<>();
+    }
     public synchronized LiveData<ArrayList<Shift>> getShifts(Context context) {
-        if (shifts == null) {
-            shifts = new MutableLiveData<>();
-            this.context = context;
-            loadShifts(context);
-        }
-
+        loadShifts(context);
         return shifts;
     }
 public void addNewShift(Shift newShift,Context context){
@@ -66,28 +63,8 @@ public void addNewShift(Shift newShift,Context context){
         }
         return selectedShift;
     }
-    public void saveEntrance(Shift shift,Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(shift);
-        editor.putString("entrance",json);
-        editor.commit();
-    }
-    public Shift getSavedEntrance(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        Type type = new TypeToken<Shift>(){}.getType();
 
-        return gson.fromJson(sharedPreferences.getString("entrance","null"),type);
-    }
-    public void deleteEntrance(Shift shift,Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove("entrance");
-        editor.commit();
-    }
-    public void notifyChangedShiftsList(){
+    public void notifyChangedShiftsList(Context context){
         SharedPreferences sharedPreferences = context.getSharedPreferences("shifts", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -98,9 +75,9 @@ public void addNewShift(Shift newShift,Context context){
     }
 
 
-    public void reloadAllCountriesFromDB(){
+    public void reloadAllCountriesFromDB(Context context){
             this.allShifts = new ArrayList<Shift>(this.allShifts);
-            this.notifyChangedShiftsList();
+            this.notifyChangedShiftsList(context);
     }
 
 }

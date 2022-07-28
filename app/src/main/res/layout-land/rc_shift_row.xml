@@ -7,21 +7,32 @@
 
     <TextView
         android:id="@+id/startTime"
-        android:layout_width="118dp"
-        android:layout_height="20dp"
+        android:layout_width="208dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:text="8:00"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="12sp"
-        app:layout_constraintEnd_toStartOf="@+id/textView5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"></TextView>
 
     <TextView
+        android:id="@+id/toLocation"
+        android:layout_width="301dp"
+        android:layout_height="19dp"
+        android:layout_marginStart="20dp"
+        android:text="Karmiel, Israel"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@+id/fromLocatiom"
+        app:layout_constraintTop_toBottomOf="@+id/endTime" />
+
+    <TextView
         android:id="@+id/endTime"
-        android:layout_width="165dp"
-        android:layout_height="20dp"
+        android:layout_width="301dp"
+        android:layout_height="19dp"
         android:layout_marginTop="4dp"
         android:paddingLeft="5dp"
         android:text="15:00"
@@ -32,33 +43,52 @@
         app:layout_constraintTop_toTopOf="parent"></TextView>
 
     <TextView
+        android:id="@+id/textView5"
+        android:layout_width="20dp"
+        android:layout_height="17dp"
+        android:layout_marginTop="4dp"
+        android:text="-"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@+id/startTime"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/fromLocatiom"
+        android:layout_width="208dp"
+        android:layout_height="19dp"
+        android:layout_marginStart="80dp"
+        android:text="Kfar yasif,Israel"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startTime" />
+
+    <TextView
         android:id="@+id/notes"
-        android:layout_width="408dp"
+        android:layout_width="0dp"
         android:layout_height="25dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="2dp"
         android:text="No transportaions!"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/startTime" />
 
     <TextView
         android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
+        android:layout_width="74dp"
+        android:layout_height="23dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="3dp"
+        android:layout_marginEnd="5dp"
         android:text="7/5/2022"
+        android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@+id/startTime"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/totalHours"
-        android:layout_width="52dp"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="1dp"
         android:layout_marginTop="4dp"
@@ -68,34 +98,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/endTime"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="10dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="4dp"
-        android:text="-"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@+id/endTime"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/fromLocatiom"
-        android:layout_width="128dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:text="Kfar yasif,Israel"
-        android:textAlignment="center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/startTime" />
-
-    <TextView
-        android:id="@+id/toLocation"
-        android:layout_width="165dp"
-        android:layout_height="wrap_content"
-        android:text="Karmiel, Israel"
-        android:textAlignment="center"
-        app:layout_constraintStart_toEndOf="@+id/fromLocatiom"
-        app:layout_constraintTop_toBottomOf="@+id/endTime" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.example.hourstracker.ui.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.view.LayoutInflater;
@@ -14,14 +15,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hourstracker.MainActivity;
 import com.example.hourstracker.R;
+import com.example.hourstracker.ui.Dialogs.NoteDialogFragment;
 import com.example.hourstracker.ui.Models.Shift;
 import com.example.hourstracker.ui.ViewModels.ShiftsViewModel;
+import com.example.hourstracker.ui.home.HomeFragment;
 
+import org.w3c.dom.Text;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class ShiftsAdapter extends
-        RecyclerView.Adapter<ShiftsAdapter.ShiftViewHolder> {
+        RecyclerView.Adapter<ShiftsAdapter.ShiftViewHolder> implements NoteDialogFragment.INoteDialogListener {
     Context context;
     ArrayList<Shift> allShifts;
     ShiftAdapterListener listener;
@@ -109,12 +117,22 @@ public class ShiftsAdapter extends
 
         }
 
-        shiftsViewModel.notifyChangedShiftsList();
+        shiftsViewModel.notifyChangedShiftsList(context);
         this.notifyDataSetChanged(); // notify the view for changed dataset in order to refresh the view.
     }
 
     public Shift getItem(int position) {
         return this.allShifts.get(position);
+    }
+
+    @Override
+    public void onFinishEnterNote(String note) {
+
+    }
+
+    @Override
+    public void onCancelEnterNote() {
+
     }
 
     class ShiftViewHolder extends RecyclerView.ViewHolder {
@@ -124,6 +142,8 @@ public class ShiftsAdapter extends
         TextView totalHours;
         TextView date;
         TextView Notes;
+        TextView startLocation;
+        TextView endLocation;
         int positionInt;
         public ShiftViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -133,18 +153,31 @@ public class ShiftsAdapter extends
             Notes = itemView.findViewById(R.id.notes);
             totalHours = itemView.findViewById(R.id.totalHours);
             date = itemView.findViewById(R.id.date);
+            startLocation = itemView.findViewById(R.id.fromLocatiom);
+            endLocation = itemView.findViewById(R.id.toLocation);
 
         }
 
         private void bindData(int position) {
             final Shift shift = allShifts.get(position);
             positionInt = position;
+            DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
 
-            startTime.setText(shift.getStartTime()!=null?shift.getStartTime().toString():"");
-            endTime.setText(shift.getEndTime()!=null?shift.getEndTime().toString():"");
+            startTime.setText(shift.getStartTime()!=null?dateFormat.format(shift.getStartTime()):"00:00");
+            endTime.setText(shift.getEndTime()!=null?dateFormat.format(shift.getEndTime()):"00:00");
             Notes.setText(shift.getNotes()!=null?shift.getNotes():"");
-            totalHours.setText(""+shift.getTotalHours());
-            date.setText(shift.getShiftDate()!=null?shift.getShiftDate().toString():"");
+            startLocation.setText(shift.getFromLocationName(context));
+            endLocation.setText(shift.getFromLocationName(context));
+
+            int hours=0;
+            int minutes=0;
+            if(shift.getTotalHours()!=null){
+               hours= shift.getTotalHours().hours;
+                minutes=shift.getTotalHours().minutes;
+            }
+
+            totalHours.setText( String.format("%02d", hours)+":"+String.format("%02d", minutes));
+//            date.setText(shift.getShiftDate()!=null?shift.getShiftDate().toString():"");
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -155,16 +188,16 @@ public class ShiftsAdapter extends
                     return false;
                 }
             });
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-////                    notifyItemChanged(selectedPosition);
-//                    shiftsViewModel.setSelectedShift(shift);
-////                    notifyItemChanged(getLayoutPosition());
-//                    ((ShiftAdapterListener) context).onShiftChange(position, shift);
-//
-//                }
-//            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+//                    notifyItemChanged(selectedPosition);
+//                    notifyItemChanged(getLayoutPosition());
+                    NoteDialogFragment.newInstance(ShiftsAdapter.this,shift.getNotes()).show(((MainActivity)context).getSupportFragmentManager(),"note");
+                    ((ShiftAdapterListener) context).onShiftChange(position, shift);
+
+                }
+            });
         }
 
 

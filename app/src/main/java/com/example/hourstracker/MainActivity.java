@@ -1,12 +1,21 @@
 package com.example.hourstracker;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.hourstracker.BroadcastReceivers.GPSReceiver;
+import com.example.hourstracker.databinding.ActivityMainBinding;
 import com.example.hourstracker.ui.Adapters.ShiftsAdapter;
 import com.example.hourstracker.ui.Dialogs.ExitAppDialogFragment;
 import com.example.hourstracker.ui.Models.Shift;
+import com.example.hourstracker.ui.Models.Time;
 import com.example.hourstracker.ui.ViewModels.ShiftsViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -19,19 +28,24 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.example.hourstracker.R;
 
-import com.example.hourstracker.databinding.ActivityMainBinding;
+
+import java.time.ZoneId;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements ShiftsAdapter.ShiftAdapterListener {
 
     private ActivityMainBinding binding;
-
+private GPSReceiver gpsChangeReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        IntentFilter filter = new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION);
+        filter.addAction(Intent.ACTION_PROVIDER_CHANGED);
+        gpsChangeReceiver= new GPSReceiver();
 //        ShiftsViewModel shiftsViewModel = new ViewModelProvider(this).get(ShiftsViewModel.class);
+        registerReceiver(gpsChangeReceiver,filter);
 
 //        BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -53,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements ShiftsAdapter.Shi
         getMenuInflater().inflate(R.menu.main,menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){

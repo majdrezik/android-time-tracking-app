@@ -1,50 +1,101 @@
 package com.example.hourstracker.ui.home;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import static android.content.Context.LOCATION_SERVICE;
+
+import android.Manifest;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.SystemClock;
-import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import java.sql.Time;
-import java.text.SimpleDateFormat;
-
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.hourstracker.MainActivity;
 import com.example.hourstracker.R;
+import com.example.hourstracker.Service.ExceededHoursService;
 import com.example.hourstracker.databinding.FragmentHomeBinding;
 import com.example.hourstracker.ui.Dialogs.NoteDialogFragment;
 import com.example.hourstracker.ui.Models.Shift;
 import com.example.hourstracker.ui.ViewModels.ShiftsViewModel;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+@RequiresApi(api = Build.VERSION_CODES.N)
 public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDialogListener {
-
+    int LOCATION_REFRESH_TIME = 15000; // 15 seconds to update
+    int LOCATION_REFRESH_DISTANCE = 500; // 500 meters to update
+    int SERVICE_ID=2;
     private FragmentHomeBinding binding;
-
+    private LocationManager mLocationManager;
+    ActivityResultLauncher<String[]> locationPermissionRequest =
+            registerForActivityResult(new ActivityResultContracts
+                            .RequestMultiplePermissions(), result -> {
+                        Boolean fineLocationGranted = result.getOrDefault(
+                                Manifest.permission.ACCESS_FINE_LOCATION, false);
+                        Boolean coarseLocationGranted = result.getOrDefault(
+                                Manifest.permission.ACCESS_COARSE_LOCATION,false);
+                        if (fineLocationGranted != null && fineLocationGranted) {
+                            // Precise location access granted.
+                        } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                            // Only approximate location access granted.
+                        } else {
+                            // No location access granted.
+                        }
+                    }
+            );
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
-
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        mLocationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            locationPermissionRequest.launch(new String[] {
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            });
+        }
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME,
+                    LOCATION_REFRESH_DISTANCE, mLocationListener);
+
 
         //homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
@@ -55,6 +106,14 @@ public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDi
         super.onDestroyView();
         binding = null;
     }
+    public static Location currLocation;
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            //your code here
+            currLocation = location;
+        }
+    };
 
     private Chronometer chronometer;
     private long pauseOffSet = 0;
@@ -64,106 +123,122 @@ public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDi
     private List<Integer> times = new ArrayList<>();
     private int listIndex = 0;
     private String m_Text = "";
+    private HomeViewModel homeViewModel;
     private ShiftsViewModel shiftsViewModel;
+    private Date lastEndTime;
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         super.onCreate(savedInstanceState);
-       //viewy setContentView(R.layout.activity_main);
         chronometer = view.findViewById(R.id.chronometer);
         toggleButton = view.findViewById(R.id.Toggle);
-        //shiftsViewModel = new ShiftsViewModel();
-//        reset_btn = view.findViewById(R.id.reset_btn);
         toggleButton.setText(null);
         toggleButton.setTextOn(null);
         toggleButton.setTextOff(null);
-        shiftsViewModel = new ViewModelProvider((AppCompatActivity) getActivity()).get(ShiftsViewModel.class);
-        HomeViewModel myViewModel = new ViewModelProvider((AppCompatActivity) getActivity()).get(HomeViewModel.class);
-//        myViewModel.getShift().observe((AppCompatActivity) getActivity(),(res)->
-//                asdasdasdasd
-//        );
+        homeViewModel = new ViewModelProvider((AppCompatActivity) getActivity()).get(HomeViewModel.class);
+        shiftsViewModel =  new ViewModelProvider((AppCompatActivity) getActivity()).get(ShiftsViewModel.class);
+        Shift saveShift= homeViewModel.getSavedEntrance(getActivity());
 
-        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        if(saveShift!=null){
+            Date currentTime = Calendar.getInstance().getTime();
+            long fromMS = 0;
+            if(saveShift.getEndTime()==null){
+                fromMS=currentTime.getTime();
+            }else{
+                fromMS=saveShift.getEndTime().getTime();
+            }
+            long diffMS = fromMS-saveShift.getStartTime().getTime();
+            long diff = diffMS/1000; // parse to seconds
+            long diffMinutes = diff/60; // parse to minutes
+            int hours = (int)diffMinutes/60;
+            int minutes =(int)(diffMinutes -hours*60)%60;
+            chronometer.setBase(SystemClock.elapsedRealtime() - diffMS);
+
+            if(saveShift.getEndTime()==null){
+                chronometer.start();
+                ((ToggleButton)view.findViewById(R.id.Toggle)).setChecked(true);
+                isPlaying=true;
+
+            }else{
+                chronometer.stop();
+                ((ToggleButton)view.findViewById(R.id.Toggle)).setChecked(false);
+                isPlaying=false;
+            }
+
+            //            chronometer.setText(hours+":"+minutes+":"+diff%60);
+        }
+        this.refreshSummary();
+        toggleButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean buttonState) {
+            public void onClick(View view) {
+                ToggleButton bnt = (ToggleButton) view.findViewById(R.id.Toggle);
+                Boolean buttonState =bnt.isChecked();
+
                 //buttonState: true if button is pressed, otherwise false
                 if(buttonState){
 //                    myViewModel.setCurrentShift();
 
-                    addNewShiftToShiftsList();
+                    saveShiftEntranceToDB();
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     // SystemClock.elapsedRealtime() is the number of milliseconds since the device was turned on.
                     // without the following line, when we stop the chronometer for a specific time, it will start again with the specific time that passed in the background.
                     // i.e. if we stopped the timer at 5:00 for 30 seconds, and start again, it'll start from 5:30 instead of 5:00
                     showToast("start timer");
-//                    chronometer.setBase(SystemClock.elapsedRealtime()- pauseOffSet);
-//                    System.out.println(SystemClock.elapsedRealtime()- pauseOffSet);
+
                     chronometer.start();
                     isPlaying = true;
                 }else{
-//                    NoteDialogFragment.newInstance(HomeFragment.this).show(getFragmentManager(),"");
-                    showToast("pause timer");
-                    chronometer.stop();
-//                    pauseOffSet = SystemClock.elapsedRealtime()- chronometer.getBase();
-                    isPlaying = false;
-                    updateTimesList();
-//                    showDialog();
+                    bnt.setChecked(true);
+                    lastEndTime =  Calendar.getInstance().getTime();
+                    NoteDialogFragment dilaog= NoteDialogFragment.newInstance(HomeFragment.this,"");
+                    dilaog.show(getFragmentManager(),"note");
+
                 }
+                HomeFragment.this.refreshSummary();;
+
             }
         });
 
-        // in our project, we decided that the restart could be done only when the timer is running. i.e, isPlaying == true
-//        reset_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(isPlaying){
-//                    showToast("reset timer");
-//                    chronometer.setBase(SystemClock.elapsedRealtime());
-//                    pauseOffSet = 0;
-//                    chronometer.start();
-//                    isPlaying = true;
-//                    calculateTotalTime();
-//                }
-//            }
-//        });
+    }
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    void refreshSummary(){
+        Shift saveShift= homeViewModel.getSavedEntrance(getActivity());
+        TextView summary = HomeFragment.this.getView().findViewById(R.id.summaryHome);
+if(summary==null){
+    return ;
+}
+        if(saveShift!=null){
+            DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+            String summaryTxt = "";
+            summaryTxt =dateFormat.format(saveShift.getStartTime())+"-";
+            Intent serviceIntent = new Intent(getActivity(),ExceededHoursService.class );
+            serviceIntent.putExtra("startDate",saveShift.getStartTime());
+            if(saveShift.getEndTime()!=null){
+                summaryTxt+=dateFormat.format(saveShift.getEndTime());
+                getActivity().getApplicationContext().stopService(serviceIntent);
+
+            }else{
+                getActivity().getApplicationContext().startService(serviceIntent);
+            }
+            summary.setText(summaryTxt);
+
+        }else{
+            summary.setText("");
+        }
+    }
+    private void saveShiftEntranceToDB() {
+        Shift newShift = new Shift();
+        Date currentTime = Calendar.getInstance().getTime();
+        if(currLocation!=null) {
+            newShift.setStartLatitude(currLocation.getLatitude());
+            newShift.setStartLongitude(currLocation.getLongitude());
+        }
+        newShift.setStartTime(currentTime);
+        homeViewModel.saveEntrance(newShift,getActivity());
     }
 
-    private void addNewShiftToShiftsList() {
-        Shift newShift = new Shift();
-        Time now = new Time(SystemClock.elapsedRealtime());
-        now.setTime(SystemClock.elapsedRealtime());
-        System.out.println("Start Time: ");
-        System.out.println(now.toString());
-        newShift.setStartTime(now);
-        shiftsViewModel.saveEntrance(newShift);
-    }
-    
-//    private void showDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Title");
-//
-//// Set up the input
-//        final EditText input = new EditText(this);
-//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-//        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//        builder.setView(input);
-//
-//// Set up the buttons
-//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                m_Text = input.getText().toString();
-//            }
-//        });
-//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-//
-//        builder.show();
-//    }
 
     private void updateTimesList(){
         int stoppedMilliseconds = 0;
@@ -212,8 +287,35 @@ public class HomeFragment extends Fragment implements NoteDialogFragment.INoteDi
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onFinishSelectPrecision(String note) {
-
+    public void onFinishEnterNote(String note) {
+        ToggleButton bnt = (ToggleButton) getActivity().findViewById(R.id.Toggle);
+        bnt.setChecked(false);
+        showToast("pause timer");
+        chronometer.stop();
+        isPlaying = false;
+        updateTimesList();
+        Shift currShift = homeViewModel.getSavedEntrance(getActivity());
+        currShift.setEndTime(lastEndTime);
+        currShift.setNotes(note);
+        if(currLocation!=null) {
+            currShift.setEndLatitude(currLocation.getLatitude());
+            currShift.setEndLongitude(currLocation.getLongitude());
+        }
+        this.homeViewModel.saveEntrance(currShift,getActivity());
+        this.shiftsViewModel.addNewShift(currShift,getActivity());
+        this.refreshSummary();
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onCancelEnterNote() {
+        this.refreshSummary();
+
+//        ToggleButton bnt = (ToggleButton) getActivity().findViewById(R.id.Toggle);
+//        bnt.setChecked(true);
+    }
+
+
 }
